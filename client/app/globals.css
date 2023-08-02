@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--foreground-rgb: 0, 0, 0;
+	--background-start-rgb: 214, 219, 220;
+	--background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--foreground-rgb: 255, 255, 255;
+		--background-start-rgb: 0, 0, 0;
+		--background-end-rgb: 0, 0, 0;
+	}
+}
+
+body {
+	color: rgb(var(--foreground-rgb));
+	background: linear-gradient(
+			to bottom,
+			transparent,
+			rgb(var(--background-end-rgb))
+		)
+		rgb(var(--background-start-rgb));
+}
+
+h2 {
+	font-family: var(--font-league-gothic);
+}
+
+h3 {
+	font-family: var(--font-manrope);
+}
+
+.loading {
+	display: inline-flex;
+	align-items: center;
+}
+
+.loading .spacer {
+	margin-right: 2px;
+}
+
+.loading span {
+	animation-name: blink;
+	animation-duration: 1.4s;
+	animation-iteration-count: infinite;
+	animation-fill-mode: both;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	display: inline-block;
+	margin: 0 1px;
+}
+
+.loading span:nth-of-type(2) {
+	animation-delay: 0.2s;
+}
+
+.loading span:nth-of-type(3) {
+	animation-delay: 0.4s;
+}
+
+@keyframes blink {
+	0% {
+		opacity: 0.2;
+	}
+	20% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0.2;
+	}
+}
+.bg-gradient-to-r {
+	background: linear-gradient(to right, rgb(182, 244, 146), rgb(51, 139, 147));
+}
+
+.bg-gradient-to-r.hover:bg-red-500 {
+	background: linear-gradient(
+		to right,
+		rgb(182, 244, 146),
+		rgb(51, 139, 147),
+		red
+	);
+}
+
+.flex {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.container {
+	/* Set the width to ensure equal sizing and responsiveness */
+	flex: 0 0 calc(50% - 2rem); /* You can adjust the percentage as needed */
+	margin: 1rem; /* Add some margin between the bio containers */
+	/* Set overflow to hidden to truncate long text if it doesn't fit */
+	overflow: hidden;
+	/* Add other styling properties as needed */
+}
