@@ -1,4 +1,4 @@
-# AI-powered food&drinks guide web-app for Almaty
+# AI-powered restaurant picker web-app for Almaty
 
 ## How it works
 
