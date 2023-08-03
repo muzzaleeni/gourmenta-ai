@@ -14,22 +14,22 @@ export default function Header() {
 			</div>
 			<div className="flex space-x-4">
 				<ScrollLink className="btn" href="#about-section">
-					<h3 className="text-white text-base font-thin leading-normal">
+					<h3 className="text-white text-base font-thin leading-normal hover:text-gray-200">
 						About
 					</h3>
 				</ScrollLink>
 				<ScrollLink className="btn" href="#how-it-works-section">
-					<h3 className="text-white text-base font-thin leading-normal">
+					<h3 className="text-white text-base font-thin leading-normal hover:text-gray-200">
 						How it works?
 					</h3>
 				</ScrollLink>
 				<ScrollLink className="btn" href="#demo-section">
-					<h3 className="text-white text-base font-thin leading-normal">
+					<h3 className="text-white text-base font-thin leading-normal hover:text-gray-200">
 						Demo
 					</h3>
 				</ScrollLink>
 				<ScrollLink className="btn" href="#why-us-section">
-					<h3 className="text-white text-base font-thin leading-normal">
+					<h3 className="text-white text-base font-thin leading-normal hover:text-gray-200">
 						Why us?
 					</h3>
 				</ScrollLink>

@@ -20,6 +20,7 @@ export default function Footer() {
 							width={20}
 							height={20}
 							alt="instagram"
+							className="hover:opacity-80"
 						/>
 					</a>
 					<a
@@ -27,7 +28,13 @@ export default function Footer() {
 						target="_blank"
 						rel="noopener noreferrer"
 						className="cursor-pointer">
-						<Image src="/twitter.svg" width={20} height={20} alt="twitter" />
+						<Image
+							src="/twitter.svg"
+							width={20}
+							height={20}
+							alt="twitter"
+							className="hover:opacity-80"
+						/>
 					</a>
 				</div>
 			</div>

@@ -1,16 +1,32 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Toaster, toast } from "react-hot-toast";
+import { useRef, useState, useEffect } from "react";
 import Github from "@/components/GitHub";
 import Demo_Title from "@/components/demo_title";
 import { useChat } from "ai/react";
+import { redirect } from "next/dist/server/api-utils";
+
+interface LocationType {
+	latitude: number;
+	longitude: number;
+}
 
 export default function Demo() {
 	const [bio, setBio] = useState("");
 	const bioRef = useRef<null | HTMLDivElement>(null);
 	const [isHovered, setIsHovered] = useState(false);
 	const [isBlurred, setIsBlurred] = useState<boolean[]>([]); // Initialize as an empty array
+	const [location, setLocation] = useState<LocationType | undefined>(undefined);
+
+	useEffect(() => {
+		if ("geolocation" in navigator) {
+			// Retrieve latitude & longitude coordinates from `navigator.geolocation` Web API
+			navigator.geolocation.getCurrentPosition(({ coords }) => {
+				const { latitude, longitude } = coords;
+				setLocation({ latitude, longitude });
+			});
+		}
+	}, []);
 
 	const scrollToBios = () => {
 		if (bioRef.current !== null) {
@@ -24,6 +40,7 @@ export default function Demo() {
 				bio,
 			},
 			onResponse() {
+				console.log(bio);
 				scrollToBios();
 				setIsHovered(false);
 			},
@@ -31,6 +48,7 @@ export default function Demo() {
 
 	const onSubmit = (e: any) => {
 		setBio(input);
+		fetchDataAndUpdateBio();
 		handleSubmit(e);
 	};
 
@@ -56,13 +74,39 @@ export default function Demo() {
 		});
 	};
 
+	const fetchDataAndUpdateBio = async () => {
+		try {
+			const response = await fetch("http://0.0.0.0:8000/recommend", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					user_preference: input, // Use the current value of 'input' (which is the 'bio')
+					user_latitude: location?.latitude, // Replace this with the actual user latitude
+					user_longitude: location?.longitude, // Replace this with the actual user longitude
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error("Network response was not ok");
+			}
+
+			const data = await response.json();
+			setBio(data); // Assuming the API response has a 'bio' field, adjust it accordingly if needed
+		} catch (error) {
+			console.error("Error:", error);
+			// Handle any errors or display an error message to the user
+		}
+	};
+
 	return (
 		<div>
 			<Demo_Title />
 			<main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
 				<a
 					className="flex max-w-fit items-center justify-center space-x-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 shadow-md transition-colors hover:bg-gray-200 mb-5"
-					href="https://github.com/muzzaleeni/gourmenta.ai"
+					href="https://github.com/muzzaleeni/gourmenta-ai"
 					target="_blank"
 					rel="noopener noreferrer">
 					<Github />
@@ -127,28 +171,19 @@ export default function Demo() {
 						</button>
 					)}
 				</form>
-				<Toaster
-					position="top-center"
-					reverseOrder={false}
-					toastOptions={{ duration: 2000 }}
-				/>
-				<hr className="h-px bg-gray-700 border-1 dark:bg-gray-700" />
 				<output className="space-y-10 my-10">
 					{generatedBios && (
 						<>
 							<div className="flex flex-wrap justify-center max-w-xl mx-auto">
 								{generatedBios
-									.substring(generatedBios.indexOf("1") + 3)
-									.split("2.")
+									.split(/(?=\d+\.\s)/)
 									.map((generatedBio, index) => {
 										return (
 											<div
-												className="shadow-md p-4 transition cursor-copy container rounded-[1em]"
+												className="shadow-md p-4 transition container rounded-[1em]"
 												onClick={() => {
-													navigator.clipboard.writeText(generatedBio);
-													toast("Bio copied to clipboard", {
-														icon: "✂️",
-													});
+													const link = generatedBio.split(" ")[1];
+													window.open(link, "_blank");
 												}}
 												key={generatedBio}
 												style={{ position: "relative" }}
@@ -167,7 +202,7 @@ export default function Demo() {
 														backgroundPosition: "center",
 														backgroundRepeat: "no-repeat",
 														filter: `blur(${
-															isBlurred[index] ? "10px" : "0px"
+															isBlurred[index] ? "10px" : "3px"
 														})`,
 														zIndex: -1,
 														borderRadius: "1rem",

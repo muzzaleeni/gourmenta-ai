@@ -16,7 +16,7 @@ export default function Try() {
 			</div>
 			<div className="try-button mt-6">
 				<Link href="/demo">
-					<div className="w-full md:w-auto h-10 flex justify-center items-center bg-white text-[#383843] rounded-[8px] px-4 md:px-6 max-w-[200px] text-sm font-bold">
+					<div className="w-full md:w-auto h-10 flex justify-center items-center bg-white text-[#383843] rounded-[8px] px-4 md:px-6 max-w-[200px] text-sm font-bold hover:bg-gray-200">
 						Try it out!
 					</div>
 				</Link>
