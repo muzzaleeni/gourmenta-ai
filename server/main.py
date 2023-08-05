@@ -1,7 +1,7 @@
 from sql_request import find_instances
 from entity_retrieval import retrieve_entities_from_query
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from config import env, fastapi_config
 
@@ -10,7 +10,7 @@ app = FastAPI(**fastapi_config)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=env.CORS_ORIGINS,
+    allow_origins="https://gourmenta-ai.vercel.app",
     allow_methods=env.CORS_METHODS,
     allow_headers=env.CORS_HEADERS,
     allow_credentials=True,
