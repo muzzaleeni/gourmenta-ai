@@ -50,9 +50,7 @@ def find_instances(entities, user_latitude, user_longitude):
     rating = str(parsed_entities[5].get("Рейтинг")).lstrip()
 
     print(place_type, cuisine, specific_food, radius, price, rating)
-    connection = sqlite3.connect(
-        "/Users/muzzyaqow/Documents/projects/gourmenta.ai/server/identifier.sqlite"
-    )
+    connection = sqlite3.connect("identifier.sqlite")
     cursor = connection.cursor()
 
     # Execute the main SQL query to fetch the results
