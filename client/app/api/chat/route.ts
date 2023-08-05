@@ -15,13 +15,14 @@ export async function POST(req: Request) {
 
 	// Ask OpenAI for a streaming completion given the prompt
 	const response = await openai.createChatCompletion({
-		model: "gpt-3.5-turbo",
+		model: "gpt-4",
 		stream: true,
 		messages: [
 			{
 				role: "user",
-				content: `Below, you can find the website links for several restaurants. I will need you to just return me the same links but in labeled manner. 1., 2., ...;.
-				Links: ${bio}`,
+				content: `You are provided with list of restaurant details - ${bio}
+				If it's content-wise empty, return "Sorry, but there are no restaurants matching your criteria. Please try again."
+				Otherwise, generate for each restaurant the reasoning for why it was recommended based on the user's preferences and the restaurant's attributes using the following template:`,
 			},
 		],
 	});
