@@ -104,12 +104,6 @@ export default function Demo() {
 
 	return (
 		<div>
-			<Head>
-				<meta
-					http-equiv="Content-Security-Policy"
-					content="upgrade-insecure-requests"
-				/>
-			</Head>
 			<Demo_Title />
 			<main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
 				<a

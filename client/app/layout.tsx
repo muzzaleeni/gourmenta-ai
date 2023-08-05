@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { League_Gothic } from "next/font/google";
 import { Manrope } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import Head from "next/head";
 
 const text_font = League_Gothic({
 	subsets: ["latin"],
@@ -30,6 +31,11 @@ export default function RootLayout({
 		<html
 			lang="en"
 			className={`${text_font.variable} ${content_font.variable}`}>
+			<Head>
+				<meta
+					http-equiv="Content-Security-Policy"
+					content="upgrade-insecure-requests"></meta>
+			</Head>
 			<body>{children}</body>
 			<Analytics></Analytics>
 		</html>
