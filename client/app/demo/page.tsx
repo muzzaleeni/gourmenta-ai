@@ -43,11 +43,14 @@ export default function Demo() {
 
 	const fetchDataAndUpdateBio = async () => {
 		try {
-			const response = await axios.post("http://0.0.0.0:8000/recommend", {
-				user_preference: input, // Use the current value of 'input' (which is the 'bio')
-				user_latitude: location?.latitude, // Replace this with the actual user latitude
-				user_longitude: location?.longitude, // Replace this with the actual user longitude
-			});
+			const response = await axios.post(
+				"https://gourmenta-ai.onrender.com/recommend",
+				{
+					user_preference: input, // Use the current value of 'input' (which is the 'bio')
+					user_latitude: location?.latitude, // Replace this with the actual user latitude
+					user_longitude: location?.longitude, // Replace this with the actual user longitude
+				}
+			);
 
 			if (response.status !== 200) {
 				throw new Error("Network response was not ok");
