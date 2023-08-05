@@ -1,7 +1,7 @@
 from sql_request import find_instances
 from entity_retrieval import retrieve_entities_from_query
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from config import env, fastapi_config
 
