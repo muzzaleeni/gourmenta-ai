@@ -1,5 +1,6 @@
 import sqlite3
 from math import radians, sin, cos, sqrt, atan2
+from typing import List
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -25,17 +26,32 @@ def haversine(lat1, lon1, lat2, lon2):
     return distance
 
 
-def find_instances(location_data):
-    user_latitude = location_data.user_latitude
-    user_longitude = location_data.user_longitude
-    place_type = location_data.place_type
-    cuisine = location_data.cuisine
-    radius = location_data.radius
-    price = location_data.price
-    rating = location_data.rating
+def parse_entities(entities: str) -> List[dict]:
+    lines = entities.split("\n")
+    parsed_entities = []
 
+    for line in lines:
+        [key, value] = line.split(":")
+        parsed_entities.append({key: value})
+
+    return parsed_entities
+
+
+def find_instances(entities, user_latitude, user_longitude):
+    parsed_entities = parse_entities(entities)
+
+    print(parsed_entities)
+
+    place_type = str(parsed_entities[0].get("Заведение")).lstrip().lower()
+    cuisine = str(parsed_entities[1].get("Кухня")).lstrip().capitalize()
+    specific_food = str(parsed_entities[2].get("Конкретная еда")).lstrip().capitalize()
+    radius = str(parsed_entities[3].get("Расстояние")).lstrip()
+    price = str(parsed_entities[4].get("Цена")).lstrip()
+    rating = str(parsed_entities[5].get("Рейтинг")).lstrip()
+
+    print(place_type, cuisine, specific_food, radius, price, rating)
     connection = sqlite3.connect(
-        "/Users/muzzyaqow/Documents/projects/Gourmenta/server/identifier.sqlite"
+        "/Users/muzzyaqow/Documents/projects/gourmenta.ai/server/identifier.sqlite"
     )
     cursor = connection.cursor()
 
@@ -43,22 +59,25 @@ def find_instances(location_data):
     queries = []
     params = []
 
-    if place_type:
-        query = "SELECT [2GIS URL] FROM Restaurants WHERE Description LIKE ?"
+    if specific_food != "-":
+        query = "SELECT Name, [2GIS URL] FROM Restaurants WHERE [Additional Information] LIKE ?"
+        queries.append(query)
+        params.append(f"%{specific_food}%")
+
+    if place_type != "-":
+        query = "SELECT Name, [2GIS URL] FROM Restaurants WHERE Description LIKE ?"
         queries.append(query)
         params.append(f"%{place_type}%")
 
-    if cuisine:
-        query = (
-            'SELECT [2GIS URL] FROM Restaurants WHERE "Additional Information" LIKE ?'
-        )
+    if cuisine != "-":
+        query = "SELECT Name, [2GIS URL] FROM Restaurants WHERE [Additional Information] LIKE ?"
         queries.append(query)
         params.append(f"%{cuisine}%")
 
-    if radius:
+    if radius != "-":
         try:
             parsed_distance = float(radius)
-            query = "SELECT [2GIS URL], Latitude, Longitude FROM Restaurants"
+            query = "SELECT Name, [2GIS URL], Latitude, Longitude FROM Restaurants"
             cursor.execute(query)
             all_restaurants = cursor.fetchall()
             nearby_restaurants = []
@@ -72,10 +91,8 @@ def find_instances(location_data):
                 if distance_to_restaurant <= parsed_distance:
                     nearby_restaurants.append(url)
 
-            query = (
-                "SELECT [2GIS URL] FROM Restaurants WHERE [2GIS URL] IN ({})".format(
-                    ", ".join(["?"] * len(nearby_restaurants))
-                )
+            query = "SELECT Name, [2GIS URL] FROM Restaurants WHERE [2GIS URL] IN ({})".format(
+                ", ".join(["?"] * len(nearby_restaurants))
             )
             queries.append(query)
             params.extend(nearby_restaurants)
@@ -83,11 +100,11 @@ def find_instances(location_data):
         except ValueError:
             pass
 
-    if price:
+    if price != "-":
         try:
             parsed_number = int(price)
             query = (
-                "SELECT [2GIS URL] FROM Restaurants WHERE "
+                "SELECT Name, [2GIS URL] FROM Restaurants WHERE "
                 '"Additional Information" LIKE ? '
                 'AND CAST(SUBSTR("Additional Information", '
                 "INSTR(\"Additional Information\", 'Средний чек') + 11) AS INTEGER) <= ?"
@@ -98,9 +115,9 @@ def find_instances(location_data):
         except ValueError:
             pass
 
-    if rating:
+    if rating != "-":
         try:
-            query = "SELECT [2GIS URL] FROM Restaurants WHERE Rating >= ?"
+            query = "SELECT Name, [2GIS URL] FROM Restaurants WHERE Rating >= ?"
             queries.append(query)
             params.append(rating)
         except ValueError:
@@ -109,16 +126,15 @@ def find_instances(location_data):
     # Combine the filter subqueries using INTERSECT
     if queries:
         whole_query = " INTERSECT ".join(queries)
-
+        print("Query: ", whole_query)
         # Prepare parameterized query and execute
-        cursor.execute(whole_query, params)
+        cursor.execute(f"{whole_query} LIMIT 5", params)
 
         # Fetch and display the final results
         final_results = cursor.fetchall()
 
         cursor.close()
         connection.close()
-
         return final_results
 
     return []

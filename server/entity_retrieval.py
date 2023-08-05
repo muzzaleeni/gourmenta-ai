@@ -1,23 +1,31 @@
 import openai
-import os
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 def retrieve_entities_from_query(query):
-    prompt = f"Извлеки из нижепроведенного запроса: 1) тип заведения 2) кухня 3) местоположение 4) ценовой диапазон 5) рейтинг и кол-во отзывов. Не надо ничего додумывать/придумывать. Работай чисто по запросу и ничего лишнего. Если информация отсутствует, то верни знак минуса. Форматируй ответ в виде 1) Тип заведения: ..., новая строка. Запрос:  {query}"
+    prompt = (
+        f"Извлеките из запроса ниже следующие объекты:\n"
+        f"Заведение, Кухня, Конкретная еда, Расстояние, Цена, Рейтинг.\n"
+        f"Разделите каждую сущность разрывом строки. Поставьте знак минус, если вы не смогли найти информацию об обьекте. Не используйте никакой текст для обьектов с числовыми значениями!\n"
+        f"Запрос для извлечения данных из: {query}\n"
+        f"Отформатировать ответ как:\n"
+        f"Заведение: ресторан\n Кухня: итальянская\n Конкретная еда: стейк\n Расстояние: 5\n Цена: 5000\n Рейтинг: 4.5\n"
+        f"Переведите извлеченные обьекты на русский язык при надобности!"
+    )
 
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": query},
+        ],
         temperature=0,
         max_tokens=2000,
     )
 
-    if "choices" in response and len(response["choices"]) > 0:
-        entities = response["choices"][0]["text"]
-        return entities
-    else:
-        print(f"Error: Unable to retrieve the entities from the API response.")
-        return None
+    return response.choices[0].message.content

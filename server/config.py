@@ -4,7 +4,9 @@ from pydantic import BaseSettings
 
 
 class Config(BaseSettings):
-    CORS_ORIGINS: list[str] = ["*"]
+    CORS_ORIGINS: list[str] = [
+        "*",
+    ]
     CORS_HEADERS: list[str] = ["*"]
     CORS_METHODS: list[str] = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
 

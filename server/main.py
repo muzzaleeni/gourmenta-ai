@@ -2,10 +2,11 @@ from sql_request import find_instances
 from entity_retrieval import retrieve_entities_from_query
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
-from config import env
 from pydantic import BaseModel
+from config import env, fastapi_config
 
-app = FastAPI()
+
+app = FastAPI(**fastapi_config)
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,29 +17,20 @@ app.add_middleware(
 )
 
 
-class LocationData(BaseModel):
+class UserPreference(BaseModel):
+    user_preference: str
     user_latitude: float
     user_longitude: float
-    place_type: str
-    cuisine: str
-    radius: float
-    price: int
-    rating: float
 
 
 @app.post("/recommend")
-def get_recommendations(location_data: LocationData):
-    # user_latitude = location_data.user_latitude
-    # user_longitude = location_data.user_longitude
-    # entities = """
-    # 1) Тип заведения:кафе;
-    # 2) Кухня:-;
-    # 3) Местоположение:2;
-    # 4) Ценовой диапазон:3000;
-    # 5) Рейтинг и кол-во отзывов:3/-;
-    # """
-    # entities_by_lines = entities.split("\n")
-    # entities_by_lines = [line.strip() for line in entities_by_lines]
-
-    instances_by_type = find_instances(location_data)
-    return instances_by_type
+async def get_recommendations(input: UserPreference):
+    user_preference = input.user_preference
+    entities = retrieve_entities_from_query(user_preference)
+    print("Entities:\n", entities)
+    context = find_instances(
+        entities, user_latitude=input.user_latitude, user_longitude=input.user_longitude
+    )
+    print("Context: ", context)
+    # response = recommend(context)
+    return context
