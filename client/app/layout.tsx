@@ -31,11 +31,6 @@ export default function RootLayout({
 		<html
 			lang="en"
 			className={`${text_font.variable} ${content_font.variable}`}>
-			<Head>
-				<meta
-					http-equiv="Content-Security-Policy"
-					content="upgrade-insecure-requests"></meta>
-			</Head>
 			<body>{children}</body>
 			<Analytics></Analytics>
 		</html>
